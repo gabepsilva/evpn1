@@ -25,6 +25,10 @@ build:
     - npm run build
     - npm run build-debian
     - npm run build-redhat
+    - ls -lhtrR dist
+  artifacts:
+    paths:
+    - dist
     
 
 
