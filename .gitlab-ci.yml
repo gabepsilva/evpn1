@@ -20,9 +20,9 @@ cache:
 build:
   script:
     - npm install
-    - npm build
-    - npm build-debian
-    - npm build-redhat
+    - npm run build
+    - npm run build-debian
+    - npm run build-redhat
     
 
 
