@@ -20,7 +20,7 @@ cache:
 build:
   script:
     - apt-get update -y
-    - apt-get install -y fakeroot
+    - apt-get install -y fakeroot rpm
     - npm install
     - npm run build
     - npm run build-debian
