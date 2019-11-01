@@ -1,0 +1,31 @@
+{
+  "name": "evpn1",
+  "version": "1.0.0",
+  "description": "Graphical interface for expressvpn client",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . --platform=linux --out=dist --overwrite",
+    "build-debian": "electron-installer-debian --src dist/evpn1-linux-x64 --dest dist --arch i386",
+    "build-redhat": "electron-installer-redhat --src dist/evpn1-linux-x64 --dest dist --arch i386",
+    "build-flatpack": "electron-installer-flatpak --src dist/evpn1-linux-x64 --dest dist --arch x64",
+    "build-snap": "electron-installer-snap --src dist/evpn1-linux-x64 --dest dist --arch x64"
+
+  },
+  "keywords": [
+    "expressvpn",
+    "vpn",
+    "gui",
+    "linux"
+  ],
+  "author": "Gabriel P da Silva",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^7.0.0",
+    "electron-installer-debian": "^2.0.1",
+    "electron-installer-flatpak": "^0.8.0",
+    "electron-installer-redhat": "^2.0.0",
+    "electron-installer-snap": "^4.0.0",
+    "electron-packager": "^14.1.0"
+  }
+}
