@@ -28,7 +28,8 @@ build:
     - ls -lhtrR dist
   artifacts:
     paths:
-    - dist
+    - dist/*.rpm
+    - dist/*.deb
     
 
 
