@@ -23,13 +23,14 @@ build:
     - apt-get install -y fakeroot rpm
     - npm install
     - npm run build
-    - npm run build-debian
-    - npm run build-redhat
-    - ls -lhtrR dist
+    - npm run build-debian 
+    - npm run build-redhat 
+    - npm run dist
   artifacts:
     paths:
     - dist/*.rpm
     - dist/*.deb
+    - dist/*.AppImage
     
 
 
