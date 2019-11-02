@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "rm -rf dist/* && electron-packager . --icon=assets/evpc.png --prune --platform=linux --arch=all --out=dist --overwrite",
+    "build": "electron-packager . --icon=assets/evpc.png --prune --platform=linux --arch=all --out=dist --overwrite",
     "build-debian": "electron-installer-debian --icon=assets/evpc.png --src dist/evpn1-linux-x64 --dest dist --arch=all",
     "build-redhat": "electron-installer-redhat --icon=assets/evpc.png --src dist/evpn1-linux-x64 --dest dist --arch=all",
     "dist": "electron-builder"
