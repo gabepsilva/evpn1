@@ -2,18 +2,41 @@ const {app, Menu, Tray, dialog, BrowserWindow} = require('electron');
 const {exec} = require('child_process');
 const path = require('path');
 
+let win
 
+function createWindow() {
+  win = new BrowserWindow({
+    width: 800,
+    height: 600,
+    show: false,
+    icon: path.join(__dirname, regularIcon),
+    webPreferences: {
+      nodeIntegration: true,
+    }
+  });
+}
 
+  app.on('ready', () => {
 
-let trayIcon;
-
-app.on('ready', () => {
-
-  trayIcon = new Tray(path.join(__dirname, disconnectedIcon));
-  setTrayIcon();
-});
+    trayIcon = new Tray(path.join(__dirname, regularIcon));
+    createWindow()
+    setTrayIcon();
+  });
+  
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit()
+    }
+  });
+  
+  app.on('activate', () => {
+    if (win === null) {
+      createWindow()
+    }
+  });
 
 // TRAY ICON VARIABLES & FUNCTIONS
+let regularIcon = 'assets/evpc.png';
 let disconnectedIcon = 'assets/evpc1r.png';
 let waitingIcon = 'assets/evpc1y.png';
 let connectedIcon = 'assets/evpc1g.png';
@@ -51,7 +74,7 @@ function eVpnCommand(param) {
       coloredClean(stderr);
       opts.message = coloredCleanGlobal;
       opts.detail = "";
-      dialog.showMessageBox(null, opts);
+      dialog.showMessageBox(win, opts);
       console.log(`stderr: ${stderr}`);
       console.log('DONE ERROR!');
       return;
@@ -74,8 +97,9 @@ function getConnectionStatusOrDie() {
   exec('expressvpn status', (err, stdout, stderr) => {
     if (err) {
       abort = true;
-      dialog.showMessageBox(null, options);
+      console.log("Evpn::ERROR\n",stderr);
       app.quit()
+      return
     }
 
     coloredClean(stdout);
@@ -92,7 +116,12 @@ function getConnectionStatusOrDie() {
       return;
     }
 
-    console.log("BUG, code should never reach here, probably new status. => ", coloredCleanGlobal);
+    let msg = stderr
+    if (msg.length <= 0){
+      msg = stdout
+    }
+    console.log("Evpn1::ERROR\n",msg);
+    app.quit()
     return false;
 
   });

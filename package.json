@@ -1,16 +1,11 @@
 {
   "name": "evpn1",
   "version": "1.0.0",
-  "description": "Graphical interface for expressvpn client",
+  "description": "A Graphical interface for expressvpn client. - Although this application is using the logo from expressvpn.com this application is independent and open source project -",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-packager . --platform=linux --out=dist --overwrite",
-    "build-debian": "electron-installer-debian --src dist/evpn1-linux-x64 --dest dist --arch i386",
-    "build-redhat": "electron-installer-redhat --src dist/evpn1-linux-x64 --dest dist --arch i386",
-    "build-flatpack": "electron-installer-flatpak --src dist/evpn1-linux-x64 --dest dist --arch x64",
-    "build-snap": "electron-installer-snap --src dist/evpn1-linux-x64 --dest dist --arch x64"
-
+    "dist": "electron-builder"
   },
   "keywords": [
     "expressvpn",
@@ -18,14 +13,20 @@
     "gui",
     "linux"
   ],
-  "author": "Gabriel P da Silva",
-  "license": "ISC",
+  "build": {
+    "appId": "evpn1",
+    "icon": "assets/logo.png",
+    "linux": {
+      "target": [
+        "AppImage"
+      ]
+    }
+  },
+  "author": "Gabriel da Silva <evpn1@psilva.email> (https://gitlab.com/gabrielpsilva)",
+  "homepage": "hhttps://gitlab.com/gabrielpsilva/evpn1",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^7.0.0",
-    "electron-installer-debian": "^2.0.1",
-    "electron-installer-flatpak": "^0.8.0",
-    "electron-installer-redhat": "^2.0.0",
-    "electron-installer-snap": "^4.0.0",
-    "electron-packager": "^14.1.0"
+    "electron-builder": "^22.1.0"
   }
 }
