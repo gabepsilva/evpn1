@@ -12,6 +12,15 @@ The easiest way to automatically start this app is by adding this command to **~
 ./evpn1-1.0.0.AppImage
 ```
 
+### Execute from source
+```shell
+git clone https://github.com/gabrielpsilva/evpn1.git
+cd evpn1
+npm install
+npm run dist
+cd dist
+./evpn1-1.0.0.AppImage
+```
 
 ### Download Binary:
 https://gitlab.com/gabrielpsilva/evpn1/-/jobs/artifacts/master/download?job=build
