@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ExpressVPN
+Comment=A Graphical interface for expressvpn client.
+Exec=/home/YOUR_USERNAME/Downloads/evpn1-1.0.0.AppImage
+Icon=/home/YOUR_USERNAME/Downloads/evpc.png
