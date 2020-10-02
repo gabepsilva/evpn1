@@ -23,7 +23,7 @@ cd dist
 ```
 
 ### Download Binary:
-https://gitlab.com/gabrielpsilva/evpn1/-/jobs/artifacts/master/download?job=build
+https://github.com/gabrielpsilva/evpn1/releases/download/1.0.1/evpn1-1.0.0.AppImage
 
 ### Adding the binary as a Gnome application
 
