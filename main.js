@@ -1,5 +1,5 @@
 const {app, Menu, Tray, dialog, BrowserWindow} = require('electron');
-const {exec} = require('child_process');
+const {exec, execSync} = require('child_process');
 const path = require('path');
 
 let win
@@ -22,13 +22,13 @@ function createWindow() {
     createWindow()
     setTrayIcon();
   });
-  
+
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
       app.quit()
     }
   });
-  
+
   app.on('activate', () => {
     if (win === null) {
       createWindow()
@@ -72,12 +72,21 @@ function eVpnCommand(param) {
     if (err) {
       let opts = JSON.parse(JSON.stringify(options));
       coloredClean(stderr);
-      opts.message = coloredCleanGlobal;
-      opts.detail = "";
-      dialog.showMessageBox(win, opts);
-      console.log(`stderr: ${stderr}`);
-      console.log('DONE ERROR!');
-      return;
+
+      // "Please disconnect first before trying to connect again."
+      if (coloredCleanGlobal.startsWith("Please disconnect first")) {
+        execSync('expressvpn disconnect');
+        // now try again
+        eVpnCommand(param);
+      } else {
+        opts.message = coloredCleanGlobal;
+        opts.detail = "";
+        dialog.showMessageBox(win, opts);
+        console.log(`stderr: ${stderr}`);
+        console.log('DONE ERROR!');
+        return;
+      }
+
     }
 
     console.log(`stdout: ${stdout}`);
