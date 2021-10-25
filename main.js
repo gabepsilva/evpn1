@@ -103,12 +103,21 @@ function eVpnCommand(param) {
     if (err) {
       let opts = JSON.parse(JSON.stringify(options));
       coloredClean(stderr);
-      opts.message = coloredCleanGlobal;
-      opts.detail = "";
-      dialog.showMessageBox(win, opts);
-      console.log(`stderr: ${stderr}`);
-      console.log('DONE ERROR!');
-      return;
+
+      // "Please disconnect first before trying to connect again."
+      if (coloredCleanGlobal.startsWith("Please disconnect first")) {
+        execSync('expressvpn disconnect');
+        // now try again
+        eVpnCommand(param);
+      } else {
+        opts.message = coloredCleanGlobal;
+        opts.detail = "";
+        dialog.showMessageBox(win, opts);
+        console.log(`stderr: ${stderr}`);
+        console.log('DONE ERROR!');
+        return;
+      }
+
     }
 
     console.log(`stdout: ${stdout}`);
