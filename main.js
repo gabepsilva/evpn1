@@ -1,9 +1,31 @@
-const {app, Menu, Tray, dialog, BrowserWindow} = require('electron');
-const {exec, execSync} = require('child_process');
+const {app, Menu, Tray, dialog, BrowserWindow, nativeImage} = require('electron');
+const {exec} = require('child_process');
+
 const path = require('path');
 
 let win
 let locationEntries = [];
+
+disconnect = () => { eVpnCommand("disconnect") };
+smart = () => { eVpnCommand("connect smart") };
+inmu1 = () => { eVpnCommand("connect inmu1") };
+jpto3 = () => { eVpnCommand("connect jpto3") };
+ukel = () => { eVpnCommand("connect ukel") };
+usnj1 = () => { eVpnCommand("connect usnj1") };
+usla3 = () => { eVpnCommand("connect usla3") };
+cato2 = () => { eVpnCommand("connect cato2") };
+br2 = () => {   eVpnCommand("connect br2") };
+let locationEntries = [
+  {label: 'Smart Location', click: smart},
+  {label: 'USA - Los Angeles - 3', click: usla3},
+  {label: 'USA - New Jersey - 1', click: usnj1},
+  {label: 'Canada Toronto 2', click: cato2},
+  {label: 'Brazil 2', click: br2},
+  {label: 'UK - East London', click: ukel},
+  {label: 'Japan - Tokyo - 3', click: jpto3},
+  {label: 'India - Mumbai - 1', click: inmu1},
+];
+let currentlyActiveLocLabel = undefined;
 
 function createWindow() {
   win = new BrowserWindow({
@@ -144,7 +166,24 @@ function getConnectionStatusOrDie() {
 
     coloredClean(stdout);
     if (coloredCleanGlobal.startsWith('Connected')) {
+      const loc = coloredCleanGlobal.replace('Connected to ', '').trim();
       trayIcon.setImage(path.join(__dirname, connectedIcon));
+
+      if (loc !== currentlyActiveLocLabel) {
+        // update indicator icon
+        locationEntries.forEach((entry) => {
+          if (entry.label === loc) {
+            entry.icon = nativeImage.createFromPath(
+              __dirname + '/assets/evpc.png'
+            ).resize({ width: 16 });
+          } else {
+            delete entry.icon;
+          }
+        });
+        updateMenu();
+        currentlyActiveLocLabel = loc;
+      }
+
       return;
     }
     if (coloredCleanGlobal.startsWith('Not connected') || coloredCleanGlobal.startsWith('Disconnected')) {
@@ -168,15 +207,10 @@ function getConnectionStatusOrDie() {
 }
 
 
-// setTrayIcon will initialize the tray icon and set a timer to update the status in case
-// the vpn connection status is changed outside this application
-function setTrayIcon() {
 
-  disconnect = () => { eVpnCommand("disconnect") };
-
+function updateMenu() {
   contextMenu = Menu.buildFromTemplate([
     {label: 'Disconnect', click: disconnect},
-    {type: 'separator'},
     ...locationEntries,
     {type: 'separator'},
     {
@@ -186,8 +220,15 @@ function setTrayIcon() {
     },
   ]);
 
-  setInterval(getConnectionStatusOrDie, 2000);
   trayIcon.setContextMenu(contextMenu);
+}
+
+
+// setTrayIcon will initialize the tray icon and set a timer to update the status in case
+// the vpn connection status is changed outside this application
+function setTrayIcon() {
+  setInterval(getConnectionStatusOrDie, 2000);
+  updateMenu();
 }
 
 
