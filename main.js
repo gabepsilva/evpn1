@@ -1,8 +1,10 @@
 const {app, Menu, Tray, dialog, BrowserWindow, nativeImage} = require('electron');
 const {exec} = require('child_process');
+
 const path = require('path');
 
 let win
+let locationEntries = [];
 
 disconnect = () => { eVpnCommand("disconnect") };
 smart = () => { eVpnCommand("connect smart") };
@@ -38,6 +40,36 @@ function createWindow() {
 }
 
   app.on('ready', () => {
+    // get locations
+    try {
+      const stdout = execSync('expressvpn ls').toString();
+      /*
+      Recommended Locations:
+      ALIAS	COUNTRY			LOCATION
+      -----	---------------		------------------------------
+      smart	Smart Location		Germany - Frankfurt - 3
+      defr3	Germany (DE)		Germany - Frankfurt - 3
+      defr1				Germany - Frankfurt - 1
+      */
+      let lines = stdout.split('\n');
+      lines = lines.slice(3).slice(0, -3);
+      locationEntries = lines.map((line) => {
+        let [alias, country, location] = line.split(/\t+/);
+        // some entries omit the country:
+        if (!location) {
+          location = country;
+        }
+        return {
+          label: location,
+          click: () => { eVpnCommand(`connect ${alias}`) },
+        };
+      });
+    } catch (err) {
+      abort = true;
+      console.log("Evpn::ERROR\n", err);
+      app.quit()
+      return
+    }
 
     trayIcon = new Tray(path.join(__dirname, regularIcon));
     createWindow()
@@ -93,12 +125,21 @@ function eVpnCommand(param) {
     if (err) {
       let opts = JSON.parse(JSON.stringify(options));
       coloredClean(stderr);
-      opts.message = coloredCleanGlobal;
-      opts.detail = "";
-      dialog.showMessageBox(win, opts);
-      console.log(`stderr: ${stderr}`);
-      console.log('DONE ERROR!');
-      return;
+
+      // "Please disconnect first before trying to connect again."
+      if (coloredCleanGlobal.startsWith("Please disconnect first")) {
+        execSync('expressvpn disconnect');
+        // now try again
+        eVpnCommand(param);
+      } else {
+        opts.message = coloredCleanGlobal;
+        opts.detail = "";
+        dialog.showMessageBox(win, opts);
+        console.log(`stderr: ${stderr}`);
+        console.log('DONE ERROR!');
+        return;
+      }
+
     }
 
     console.log(`stdout: ${stdout}`);
@@ -164,6 +205,7 @@ function getConnectionStatusOrDie() {
 
   });
 }
+
 
 
 function updateMenu() {
