@@ -1,8 +1,9 @@
 const {app, Menu, Tray, dialog, BrowserWindow} = require('electron');
-const {exec} = require('child_process');
+const {exec, execSync} = require('child_process');
 const path = require('path');
 
 let win
+let locationEntries = [];
 
 function createWindow() {
   win = new BrowserWindow({
@@ -17,18 +18,48 @@ function createWindow() {
 }
 
   app.on('ready', () => {
+    // get locations
+    try {
+      const stdout = execSync('expressvpn ls').toString();
+      /*
+      Recommended Locations:
+      ALIAS	COUNTRY			LOCATION
+      -----	---------------		------------------------------
+      smart	Smart Location		Germany - Frankfurt - 3
+      defr3	Germany (DE)		Germany - Frankfurt - 3
+      defr1				Germany - Frankfurt - 1
+      */
+      let lines = stdout.split('\n');
+      lines = lines.slice(3).slice(0, -3);
+      locationEntries = lines.map((line) => {
+        let [alias, country, location] = line.split(/\t+/);
+        // some entries omit the country:
+        if (!location) {
+          location = country;
+        }
+        return {
+          label: location,
+          click: () => { eVpnCommand(`connect ${alias}`) },
+        };
+      });
+    } catch (err) {
+      abort = true;
+      console.log("Evpn::ERROR\n", err);
+      app.quit()
+      return
+    }
 
     trayIcon = new Tray(path.join(__dirname, regularIcon));
     createWindow()
     setTrayIcon();
   });
-  
+
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
       app.quit()
     }
   });
-  
+
   app.on('activate', () => {
     if (win === null) {
       createWindow()
@@ -133,25 +164,11 @@ function getConnectionStatusOrDie() {
 function setTrayIcon() {
 
   disconnect = () => { eVpnCommand("disconnect") };
-  smart = () => { eVpnCommand("connect smart") };
-  inmu1 = () => { eVpnCommand("connect inmu1") };
-  jpto3 = () => { eVpnCommand("connect jpto3") };
-  ukel = () => { eVpnCommand("connect ukel") };
-  usnj1 = () => { eVpnCommand("connect usnj1") };
-  usla3 = () => { eVpnCommand("connect usla3") };
-  cato2 = () => { eVpnCommand("connect cato2") };
-  br2 = () => {   eVpnCommand("connect br2") };
 
   contextMenu = Menu.buildFromTemplate([
     {label: 'Disconnect', click: disconnect},
-    {label: 'Smart Location', click: smart},
-    {label: 'USA - Los Angeles - 3', click: usla3},
-    {label: 'USA - New Jersey - 1', click: usnj1},
-    {label: 'Canada Toronto 2', click: cato2},
-    {label: 'Brazil 2', click: br2},
-    {label: 'UK - East London', click: ukel},
-    {label: 'Japan - Tokyo - 3', click: jpto3},
-    {label: 'India - Mumbai - 1', click: inmu1},
+    {type: 'separator'},
+    ...locationEntries,
     {type: 'separator'},
     {
       label: 'Quit', click: () => {
