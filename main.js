@@ -4,7 +4,6 @@ const {exec} = require('child_process');
 const path = require('path');
 
 let win
-let locationEntries = [];
 
 disconnect = () => { eVpnCommand("disconnect") };
 smart = () => { eVpnCommand("connect smart") };
@@ -15,6 +14,7 @@ usnj1 = () => { eVpnCommand("connect usnj1") };
 usla3 = () => { eVpnCommand("connect usla3") };
 cato2 = () => { eVpnCommand("connect cato2") };
 br2 = () => {   eVpnCommand("connect br2") };
+
 let locationEntries = [
   {label: 'Smart Location', click: smart},
   {label: 'USA - Los Angeles - 3', click: usla3},
@@ -42,7 +42,7 @@ function createWindow() {
   app.on('ready', () => {
     // get locations
     try {
-      const stdout = execSync('expressvpn ls').toString();
+      const stdout = exec('expressvpn ls').toString();
       /*
       Recommended Locations:
       ALIAS	COUNTRY			LOCATION
@@ -128,7 +128,7 @@ function eVpnCommand(param) {
 
       // "Please disconnect first before trying to connect again."
       if (coloredCleanGlobal.startsWith("Please disconnect first")) {
-        execSync('expressvpn disconnect');
+        exec('expressvpn disconnect');
         // now try again
         eVpnCommand(param);
       } else {

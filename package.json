@@ -1,6 +1,6 @@
 {
   "name": "evpn1",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A Graphical interface for expressvpn client. - Although this application is using the logo from expressvpn.com this application is independent and open source project -",
   "main": "main.js",
   "scripts": {
