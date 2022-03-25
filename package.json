@@ -26,7 +26,7 @@
   "homepage": "hhttps://gitlab.com/gabrielpsilva/evpn1",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^11.5.0",
+    "electron": "^13.6.6",
     "electron-builder": "^22.8.1"
   }
 }
